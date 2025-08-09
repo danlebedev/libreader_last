@@ -3,5 +3,6 @@
     <link rel="icon" href="data:,">
 </head>
 <body>
-    <p>TEST</p>
+    <h1>{{ data.name }}</h1>
+    {% include "reader_app/book_item.html" with items=data.list %}
 </body>

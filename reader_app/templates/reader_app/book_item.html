@@ -1,0 +1,15 @@
+<ul>
+    {% for item in items %}
+    <li>
+        {% if item.dir %}
+        <a href="book/{{ item.dir }}">{{ item.name }}</a>
+        {% else %}
+        <p>{{ item.name }}</p>
+        {% endif %}
+        
+        {% if item.list %}
+            {% include "reader_app/book_item.html" with items=item.list %}
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
