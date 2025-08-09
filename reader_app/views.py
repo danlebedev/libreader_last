@@ -13,6 +13,12 @@ def index(request):
     return render(request, 'reader_app/index.html', context)
 
 
+def book(request, book_dir):
+    structure  = load_structure(os.path.join(LIBRARY_ROOT, str(book_dir)))
+    context = {"data": structure, "book_dir": book_dir}
+    return render(request, 'reader_app/book.html', context)
+
+
 def xml_to_json(element: Element):
     result = {'name': element.text.strip(), 'list': []}
     for node in element:

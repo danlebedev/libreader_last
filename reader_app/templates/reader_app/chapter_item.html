@@ -2,13 +2,13 @@
     {% for item in items %}
     <li>
         {% if item.dir %}
-            <a href="book/{{ item.dir }}">{{ item.name }}</a>
+            <a href="{{ book_dir }}/chapter/{{ item.dir }}">{{ item.name }}</a>
         {% else %}
             {{ item.name }}
         {% endif %}
         
         {% if item.list %}
-            {% include "reader_app/book_item.html" with items=item.list %}
+            {% include "reader_app/chapter_item.html" with items=item.list %}
         {% endif %}
     </li>
     {% endfor %}

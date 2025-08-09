@@ -5,4 +5,5 @@ app_name = 'reader_app'
 urlpatterns = [
     # Домашняя страница.
     path('', views.index, name='index'),
+    path('book/<int:book_dir>', views.book, name='book'),
 ]
