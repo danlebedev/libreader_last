@@ -44,10 +44,13 @@ def chapter(request, book_dir, chapter_dir):
 
     def image_processing(images: list[Element], images_root):
         for image in images:
-            with open(os.path.join(images_root, image.get('src')), 'rb') as fp:
-                img_data = fp.read()
-            encoded_image = base64.b64encode(img_data).decode('UTF-8')
-            image.attrib['src'] = f"data:image/png;base64,{encoded_image}"
+            try:
+                with open(os.path.join(images_root, image.get('src')), 'rb') as fp:
+                    img_data = fp.read()
+                encoded_image = base64.b64encode(img_data).decode('UTF-8')
+                image.attrib['src'] = f"data:image/png;base64,{encoded_image}"
+            except:
+                pass
     def code_processing(codes: list[Element], codes_root):
         for code in codes:
             code_root = os.path.join(codes_root, code.get('src'))
