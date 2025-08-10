@@ -3,8 +3,10 @@
     <li>
         {% if item.dir %}
             <a href="{{ book_dir }}/chapter/{{ item.dir }}">{{ item.name }}</a>
-        {% else %}
+        {% elif item.dir == '' %}
             {{ item.name }}
+        {% else %}
+            <h3>{{ item.name }}</h3>
         {% endif %}
         
         {% if item.list %}
