@@ -53,7 +53,7 @@ def chapter(request, book_dir, chapter_dir):
                 pass
     def code_processing(codes: list[Element], codes_root):
         for code in codes:
-            code_root = os.path.join(codes_root, code.get('src'))
+            code_root = os.path.join(codes_root, code.get('src', ''))
             o_image = code.find('.//image')
             o_console = code.find('.//console')
             if o_image is not None:
@@ -63,7 +63,7 @@ def chapter(request, book_dir, chapter_dir):
                 consoles.remove(o_console)
                 console_processing([o_console], os.path.join(os.path.split(code_root)[0], 'console'))
             try:
-                with open(os.path.join(codes_root, code.get('src')), encoding='utf-8') as fp:
+                with open(os.path.join(codes_root, code.get('src', '')), encoding='utf-8') as fp:
                     text = fp.read()
                     code.text = text
                     #code.insert(0, text)
@@ -71,9 +71,8 @@ def chapter(request, book_dir, chapter_dir):
                 code.text = f"{e}\n"
     def console_processing(consoles: list[Element], consoles_root):
         for console in consoles:
-            print(os.path.join(consoles_root, console.get('src')))
             try:
-                with open(os.path.join(consoles_root, console.get('src')), encoding='utf-8') as fp:
+                with open(os.path.join(consoles_root, console.get('src', '')), encoding='utf-8') as fp:
                     text = fp.read()
                     console.text = text
                     #console.insert(0, text)
