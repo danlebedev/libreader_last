@@ -7,4 +7,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('book/<int:book_dir>', views.book, name='book'),
     path('book/<int:book_dir>/chapter/<int:chapter_dir>', views.chapter, name='chapter'),
+    # API для поиска
+    path('api/search/', views.search_api, name='search_api'),
 ]
