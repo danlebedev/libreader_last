@@ -1,8 +1,10 @@
-<head>
-    <title>reader_app</title>
-    <link rel="icon" href="data:,">
-</head>
-<body>
-    <h1>{{ data.name }}</h1>
-    {% include "reader_app/chapter_item.html" with items=data.list %}
-</body>
+{% extends 'reader_app/base.html' %}
+
+{% block title %}
+reader_app
+{% endblock title %}
+
+{% block content %}
+<h1>{{ data.name }}</h1>
+{% include "reader_app/chapter_item.html" with items=data.list %}
+{% endblock content %}
