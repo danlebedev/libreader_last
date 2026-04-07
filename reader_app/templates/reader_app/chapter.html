@@ -2,25 +2,101 @@
 
 {% block head_extra %}
 <style type="text/css">
+    /* Стили для declaration */
+    declaration {
+        display: block;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-weight: bold;
+        color: #0066cc;
+        background-color: #e8f4ff;
+        padding: 8px 12px;
+        margin: 10px 0;
+        border-left: 4px solid #0066cc;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+    
+    /* Стили для command */
+    command {
+        display: block;
+        font-family: 'Consolas', 'Monaco', monospace;
+        background-color: #868686;
+        color: #f8f8f2;
+        padding: 8px 12px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-size: 0.95em;
+        overflow-x: auto;
+        white-space: pre-wrap;
+    }
+    
+    /* Стили для note */
+    note {
+        display: block;
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+    
+    note::before {
+        content: "📝 Примечание: ";
+        font-weight: bold;
+        color: #856404;
+    }
+    
+    /* Стили для attention */
+    attention {
+        display: block;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 12px 15px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-size: 0.95em;
+    }
+    
+    attention::before {
+        content: "⚠️ Внимание: ";
+        font-weight: bold;
+        color: #721c24;
+    }
+    
+    /* Дополнительные стили для улучшения читаемости */
+    code {
+        white-space: pre;
+        display: block;
+        font-family: 'Consolas', 'Monaco', monospace;
+        background-color: #f4f4f4;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    console {
+        white-space: pre;
+        display: block;
+        font-family: 'Consolas', 'Monaco', monospace;
+        background-color: #1e1e1e;
+        color: #d4d4d4;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        white-space: pre-wrap;
+        overflow-x: auto;
+    }
+
     header {
         font-size: 25px;
         font-weight: bold;
     }
-    code {
-        white-space: pre;
-    }
-    console {
-        white-space: pre;
-        background-color: black;
-        color: white;
-    }
-    declaration {
-        font-weight: bold;
-        font-family: 'Consolas';
-    }
     kw {
         font-weight: bold;
-        font-family: 'Consolas';
+        font-family: 'Consolas', 'Monaco', monospace;
     }
     comment {
         background-color: red;
