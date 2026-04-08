@@ -17,16 +17,12 @@
         <div class="container-fluid">
             <div class="row">
                 <!-- Блок поиска (слева) -->
-                <div class="col-md-4">
+                <div class="col-2">
                     <div class="mt-3">
                         <h5>Поиск по библиотеке</h5>
                         <form id="searchForm">
                             <div class="mb-2">
-                                <input type="text" 
-                                       id="searchInput" 
-                                       class="form-control" 
-                                       placeholder="Введите поисковый запрос..." 
-                                       autocomplete="off">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Введите поисковый запрос..." autocomplete="off">
                             </div>
                         </form>
                         
@@ -42,7 +38,7 @@
                 </div>
                 
                 <!-- Основной контент (справа) -->
-                <div class="col-md-8">
+                <div class="col">
                     {% block content %}
                     {% endblock content %}
                 </div>
@@ -50,199 +46,74 @@
         </div>
         
         <script>
-            // История поиска (сохраняется в localStorage)
-            let searchHistory = [];
-            const MAX_HISTORY = 10;
+            const searchInput = document.getElementById('searchInput');
+            const resultsDiv = document.getElementById('searchResults');
+            const resultsList = document.getElementById('resultsList');
+            const closeResultsBtn = document.getElementById('closeResults');
             
-            // Загружаем историю при старте
-            function loadHistory() {
-                const stored = localStorage.getItem('search_history');
-                if (stored) {
-                    searchHistory = JSON.parse(stored);
-                }
+            let debounceTimer;
+            
+
+            // Закрытие результатов
+            if (closeResultsBtn) {
+                closeResultsBtn.addEventListener('click', () => {
+                    resultsDiv.style.display = 'none';
+                    searchInput.value = '';
+                    resultsList.innerHTML = '';
+                });
             }
             
-            // Сохраняем историю
-            function saveHistory() {
-                localStorage.setItem('search_history', JSON.stringify(searchHistory.slice(0, MAX_HISTORY)));
-            }
-            
-            // Добавляем запрос в историю
-            function addToHistory(query) {
-                if (!query.trim()) return;
-                // Удаляем дубликаты
-                searchHistory = searchHistory.filter(item => item !== query);
-                searchHistory.unshift(query);
-                saveHistory();
-            }
-            
-            // Экранирование HTML
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-            
-            // Подсветка найденного слова
-            function highlightText(text, query) {
-                if (!query) return escapeHtml(text);
-                const regex = new RegExp(`(${escapeRegex(query)})`, 'gi');
-                return escapeHtml(text).replace(regex, '<mark>$1</mark>');
-            }
-            
-            // Экранирование для регулярного выражения
-            function escapeRegex(string) {
-                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            }
-            
-            // Выполнение поиска
+            // Функция поиска
             async function performSearch(query) {
-                if (!query.trim()) {
-                    hideResults();
+                if (!query) {
+                    resultsDiv.style.display = 'none';
                     return;
                 }
                 
-                // Показываем индикатор загрузки
-                showLoading();
-                
                 try {
+                    console.log('Отправка запроса:', query);
                     const response = await fetch(`/api/search/?q=${encodeURIComponent(query)}`);
                     const data = await response.json();
                     
-                    if (data.results && data.results.length > 0) {
-                        displayResults(data.results, query);
-                        addToHistory(query);
+                    if (data.results.length > 0) {
+                        resultsList.innerHTML = `
+                            <ul class="list-group">
+                                ${data.results.map(result => `
+                                    <a href="/book/${result.book_id}/chapter/${result.chapter_id}" class="list-group-item list-group-item-action">
+                                        <h6>${result.title}</h6>
+                                    </a>
+                                `).join('')}
+                            </ul>
+                        `;
+                        resultsDiv.style.display = 'block';
                     } else {
-                        displayNoResults(query);
+                        resultsList.innerHTML = '<div>Ничего не найдено</div>';
+                        resultsDiv.style.display = 'block';
                     }
                 } catch (error) {
-                    console.error('Ошибка поиска:', error);
-                    displayError();
+                    console.error('Ошибка:', error);
+                    resultsList.innerHTML = '<div>Ошибка поиска</div>';
+                    resultsDiv.style.display = 'block';
                 }
             }
             
-            // Показать индикатор загрузки
-            function showLoading() {
-                const resultsDiv = document.getElementById('searchResults');
-                const resultsList = document.getElementById('resultsList');
-                resultsList.innerHTML = '<div class="text-center text-muted my-3">Поиск...</div>';
-                resultsDiv.style.display = 'block';
-            }
-            
-            // Отобразить результаты
-            function displayResults(results, query) {
-                const resultsList = document.getElementById('resultsList');
+            // Обработчик ввода с debounce
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
                 
-                const resultsHtml = results.map(result => {
-                    let typeLabel = '';
-                    let fileInfo = '';
-                    
-                    switch(result.type) {
-                        case 'document':
-                            typeLabel = 'Текст';
-                            break;
-                        case 'code':
-                            typeLabel = 'Код';
-                            if (result.file) fileInfo = ` (${result.file})`;
-                            break;
-                        case 'console':
-                            typeLabel = 'Консоль';
-                            if (result.file) fileInfo = ` (${result.file})`;
-                            break;
-                    }
-                    
-                    // Заголовок - это название документа (главы)
-                    const title = result.title || 'Без названия';
-                    const highlightedTitle = highlightText(title, query);
-                    const highlightedSnippet = result.snippet ? highlightText(result.snippet, query) : '';
-                    
-                    return `
-                        <div class="search-result-item" data-url="/book/${result.book_dir}/chapter/${result.chapter_dir}" style="padding: 10px 0; border-bottom: 1px solid #eee; cursor: pointer;">
-                            <div style="font-weight: bold; color: #0d6efd;">
-                                ${highlightedTitle}
-                                <span style="display: inline-block; padding: 2px 6px; font-size: 0.75em; border-radius: 3px; margin-left: 8px; background-color: #e9ecef; font-weight: normal;">
-                                    ${typeLabel}${fileInfo}
-                                </span>
-                            </div>
-                            ${highlightedSnippet ? `<div style="font-size: 0.9em; color: #6c757d; margin-top: 5px;">${highlightedSnippet}</div>` : ''}
-                        </div>
-                    `;
-                }).join('');
-                
-                resultsList.innerHTML = `
-                    <div class="text-muted mb-2">
-                        Найдено: ${results.length} результат(ов)
-                    </div>
-                    ${resultsHtml}
-                `;
-                
-                // Добавляем обработчики кликов
-                document.querySelectorAll('.search-result-item').forEach(item => {
-                    item.addEventListener('click', () => {
-                        window.location.href = item.dataset.url;
-                    });
-                });
-                
-                document.getElementById('searchResults').style.display = 'block';
-            }
-            
-            // Показать сообщение "ничего не найдено"
-            function displayNoResults(query) {
-                const resultsList = document.getElementById('resultsList');
-                resultsList.innerHTML = `<div class="text-center text-muted my-3">Ничего не найдено по запросу "${escapeHtml(query)}"</div>`;
-                document.getElementById('searchResults').style.display = 'block';
-            }
-            
-            // Показать ошибку
-            function displayError() {
-                const resultsList = document.getElementById('resultsList');
-                resultsList.innerHTML = '<div class="text-center text-danger my-3">Произошла ошибка при поиске</div>';
-                document.getElementById('searchResults').style.display = 'block';
-            }
-            
-            // Скрыть результаты
-            function hideResults() {
-                document.getElementById('searchResults').style.display = 'none';
-                document.getElementById('resultsList').innerHTML = '';
-            }
-            
-            // Дебаунс для оптимизации
-            let debounceTimer;
-            function debouncedSearch(query) {
+                // Очищаем предыдущий таймер
                 clearTimeout(debounceTimer);
+                
+                // Если запрос пустой, сразу скрываем
+                if (!query) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+                
+                // Устанавливаем новый таймер - запрос отправится через 500 мс
                 debounceTimer = setTimeout(() => {
-                    if (query.trim()) {
-                        performSearch(query);
-                    } else {
-                        hideResults();
-                    }
-                }, 300);
-            }
-            
-            // Инициализация при загрузке страницы
-            document.addEventListener('DOMContentLoaded', () => {
-                loadHistory();
-                
-                const searchInput = document.getElementById('searchInput');
-                const searchForm = document.getElementById('searchForm');
-                const closeResults = document.getElementById('closeResults');
-                
-                // Поиск при отправке формы
-                searchForm.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    performSearch(searchInput.value);
-                });
-                
-                // Поиск при вводе текста
-                searchInput.addEventListener('input', (e) => {
-                    debouncedSearch(e.target.value);
-                });
-                
-                // Закрытие результатов
-                closeResults.addEventListener('click', () => {
-                    hideResults();
-                    searchInput.value = '';
-                });
+                    performSearch(query);
+                }, 500);
             });
         </script>
     </body>
