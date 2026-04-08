@@ -5,7 +5,6 @@ from xml.etree import ElementTree
 from xml.etree.ElementTree import Element
 import os
 import base64
-import re
 
 
 LIBRARY_ROOT = '/home/user/Desktop/library_last'
@@ -134,8 +133,14 @@ def search_in_library(query: str):
                     if item.lower() not in header.lower() and item.lower() not in body.lower():
                         break
                 else:
+                    with open(os.path.join(book.path, '_config', 'structure.xml'), encoding='utf-8') as fp:
+                        book_struct = fp.read()
                     results.append({
-                        'title': ''.join(ElementTree.fromstring(header).itertext()),
+                        'title': ''.join(
+                            [
+                            ElementTree.fromstring(book_struct).text,
+                            '/',
+                            *[elem for elem in ElementTree.fromstring(header).itertext()]]),
                         'book_id': os.path.split(book)[-1],
                         'chapter_id': os.path.split(chapter)[-1],
                     })
