@@ -115,6 +115,10 @@
                     performSearch(query);
                 }, 500);
             });
+            document.getElementById('searchForm').addEventListener('submit', function(e) {
+                e.preventDefault(); // Отменяем отправку формы
+                return false;       // Дополнительная страховка
+            });
         </script>
     </body>
 </html>
