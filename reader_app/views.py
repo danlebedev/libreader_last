@@ -87,6 +87,7 @@ def chapter(request, book_dir, chapter_dir):
 
     context = {
         'header': ElementTree.tostring(info_xml.getroot().find('header'), encoding='unicode'),
+        'title': ''.join(info_xml.getroot().find('header').find('p').itertext()),
         'body': ElementTree.tostring(document_xml.getroot(), encoding='unicode'),
     }
     return render(request, 'reader_app/chapter.html', context)
