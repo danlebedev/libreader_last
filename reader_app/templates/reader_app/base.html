@@ -15,9 +15,9 @@
     </head>
     <body>
         <div class="container-fluid">
-            <div class="row">
+            <div class="row vh-100">
                 <!-- Блок поиска (слева) -->
-                <div class="col-2">
+                <div class="col-2 h-100 overflow-auto">
                     <div class="mt-3">
                         <h5>Поиск по библиотеке</h5>
                         <form id="searchForm">
@@ -38,7 +38,7 @@
                 </div>
                 
                 <!-- Основной контент (справа) -->
-                <div class="col">
+                <div class="col h-100 overflow-auto">
                     {% block content %}
                     {% endblock content %}
                 </div>
