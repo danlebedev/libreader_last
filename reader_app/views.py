@@ -7,7 +7,7 @@ import os
 import base64
 
 
-LIBRARY_ROOT = '/home/user/Desktop/library_last'
+LIBRARY_ROOT = r'C:\Users\D_Spirit\Desktop\library_last'
 
 
 def index(request):
@@ -24,9 +24,9 @@ def book(request, book_dir):
 
 def chapter(request, book_dir, chapter_dir):
     chapter_root = os.path.join(LIBRARY_ROOT, str(book_dir), str(chapter_dir))
-    with open(os.path.join(chapter_root, 'info.xml')) as fp:
+    with open(os.path.join(chapter_root, 'info.xml'), encoding='utf-8') as fp:
         info_xml = ElementTree.parse(fp)
-    with open(os.path.join(chapter_root, 'document.xml')) as fp:
+    with open(os.path.join(chapter_root, 'document.xml'), encoding='utf-8') as fp:
         document_xml = ElementTree.parse(fp)
     body = document_xml.getroot()
     images = document_xml.findall('.//image')
@@ -47,7 +47,7 @@ def chapter(request, book_dir, chapter_dir):
     def image_processing(images: list[Element], images_root):
         for image in images:
             try:
-                with open(os.path.join(images_root, image.get('src')), 'rb') as fp:
+                with open(os.path.join(images_root, image.get('src')), 'rb', encoding='utf-8') as fp:
                     img_data = fp.read()
                 encoded_image = base64.b64encode(img_data).decode('UTF-8')
                 image.attrib['src'] = f"data:image/png;base64,{encoded_image}"
@@ -104,7 +104,7 @@ def xml_to_json(element: Element):
 
 
 def load_structure(path):
-    with open(os.path.join(path, '_config/structure.xml')) as fp:
+    with open(os.path.join(path, '_config/structure.xml'), encoding='utf-8') as fp:
         return xml_to_json(ElementTree.parse(fp).getroot())
 
 
@@ -126,9 +126,9 @@ def search_in_library(query: str):
 
         for chapter in os.scandir(book.path):
             if chapter.is_dir() and chapter.name.isnumeric():
-                with open(os.path.join(chapter.path, 'info.xml')) as fp:
+                with open(os.path.join(chapter.path, 'info.xml'), encoding='utf-8') as fp:
                     header = fp.read()
-                with open(os.path.join(chapter.path, 'document.xml')) as fp:
+                with open(os.path.join(chapter.path, 'document.xml'), encoding='utf-8') as fp:
                     body = fp.read()
                 for item in query.split():
                     if item.lower() not in header.lower() and item.lower() not in body.lower():
