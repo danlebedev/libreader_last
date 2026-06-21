@@ -7,7 +7,7 @@ import os
 import base64
 
 
-LIBRARY_ROOT = r'C:\Users\D_Spirit\Desktop\library_last'
+LIBRARY_ROOT = r'/home/user/Desktop/library_last'
 
 
 def index(request):
@@ -47,7 +47,7 @@ def chapter(request, book_dir, chapter_dir):
     def image_processing(images: list[Element], images_root):
         for image in images:
             try:
-                with open(os.path.join(images_root, image.get('src')), 'rb', encoding='utf-8') as fp:
+                with open(os.path.join(images_root, image.get('src')), 'rb') as fp:
                     img_data = fp.read()
                 encoded_image = base64.b64encode(img_data).decode('UTF-8')
                 image.attrib['src'] = f"data:image/png;base64,{encoded_image}"
